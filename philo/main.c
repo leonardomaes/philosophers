@@ -12,35 +12,35 @@
 
 #include "philosophers.h"
 
-/* void *computation(void *nbr)
+void	destroy_philos(t_philo *philo)
 {
-	long *number = (long*)nbr;
-	printf("nbr = %ld\n", *number);
-	return (NULL);
-} */
-
-void *computation(void *add)
-{
-	long sum = 0;
-	long *add_num = (long *) (add);
-
-	for (long i = 0; i < 1000000000; i++)
-		sum += *add_num;
-	printf("Add: %ld\n", *add_num);
-	return (NULL);
+	free(philo);
 }
 
-int	main()
+int	main(int argc, char *argv[])
 {
-	long n1 = 1;
-	long n2 = 2;
+	t_philo *philos;
+	size_t	start;		// Trash
 
-	pthread_t thread1;
-	pthread_t thread2;
-	pthread_create(&thread1, NULL, computation, (void*)&n1);
-	pthread_create(&thread2, NULL, computation, (void*)&n2);
-	pthread_join(thread1, NULL);
-	pthread_join(thread2, NULL);
+	start = get_current_time();		// Trash
+	if (argc != 5 && argc != 6)
+	{
+		write(2, "Incorret arguments\n", 19);
+		return (1);
+	}
+	if (check_args(argv) == 1)
+		return (1);
+	philos = init_philos(argv);
+	if (philos == NULL)
+		return (1);
 
+
+	for (int i = 0; i < ft_atoi(argv[1]); i++)		// Trash
+	{
+		printf("-->Philo %i:\ndie:   %zu\neat:   %zu\nsleep: %zu\n", i + 1, philos[i].time_to_die, philos[i].time_to_eat, philos[i].time_to_sleep);
+	}
+	printf("Time_philo 1 = %zu\n", get_current_time() - philos[0].start_time);		// Trash
+	destroy_philos(philos);
+	printf("Time_program = %zu\n", get_current_time() - start);		// Trash
 	return (0);
 }
