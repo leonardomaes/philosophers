@@ -34,20 +34,38 @@ int	check_args(char **argv)
 	return (0);
 }
 
-t_philo	*init_philos(char **argv)
+void	init_forks(pthread_mutex_t	*forks, int n)
 {
-	t_philo	*philo;
+	int i;
+
+	i = 0;
+	while (i < n)
+	{
+		pthread_mutex_init(forks, NULL);
+		i++;
+	}
+}
+
+void	init_philos(t_philo *philo, char **argv, pthread_mutex_t *forks)
+{
 	int		i;
 
 	i = 0;
-	philo = malloc(sizeof(t_philo) * ft_atoi(argv[1]));
+	
 	while (i < ft_atoi(argv[1]))
 	{
+		philo[i].id = i + 1;
 		philo[i].start_time = get_current_time();
+		philo[i].dead = 0;
+		philo[i].n_philos = ft_atoi(argv[1]);
 		philo[i].time_to_die = ft_atoi(argv[2]);
 		philo[i].time_to_eat = ft_atoi(argv[3]);
 		philo[i].time_to_sleep = ft_atoi(argv[4]);
+		philo[i].l_fork = &forks[i];
+		if (i == 0)
+			philo[i].r_fork = &forks[ft_atoi(argv[1]) - 1];
+		else
+			philo[i].r_fork = &forks[i - 1];
 		i++;
 	}
-	return (philo);
-} 
+}
