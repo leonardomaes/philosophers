@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo_utils.c                                      :+:      :+:    :+:   */
+/*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lmaes <lmaes@student.42porto.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -46,7 +46,14 @@ void	init_forks(pthread_mutex_t	*forks, int n)
 	}
 }
 
-void	init_philos(t_philo *philo, char **argv, pthread_mutex_t *forks)
+void	init_program(t_program	*program)
+{
+	program->dead = 0;
+	pthread_mutex_init(&program->dead_lock, NULL);
+	pthread_mutex_init(&program->meal_lock, NULL);
+}
+
+void	init_philos(t_philo *philo, char **argv, pthread_mutex_t *forks, t_program	*program)
 {
 	int		i;
 
@@ -56,11 +63,15 @@ void	init_philos(t_philo *philo, char **argv, pthread_mutex_t *forks)
 	{
 		philo[i].id = i + 1;
 		philo[i].start_time = get_current_time();
+		philo[i].last_eat = get_current_time();
 		philo[i].dead = 0;
+		philo[i].eating = 0;
 		philo[i].n_philos = ft_atoi(argv[1]);
 		philo[i].time_to_die = ft_atoi(argv[2]);
 		philo[i].time_to_eat = ft_atoi(argv[3]);
 		philo[i].time_to_sleep = ft_atoi(argv[4]);
+		philo[i].dead_lock = &program->dead_lock;
+		philo[i].meal_lock = &program->meal_lock;
 		philo[i].l_fork = &forks[i];
 		if (i == 0)
 			philo[i].r_fork = &forks[ft_atoi(argv[1]) - 1];
