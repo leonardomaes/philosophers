@@ -54,7 +54,7 @@ typedef struct s_program
 int			check_args(char **argv);
 void		init_philos(t_philo *philo, char **argv, pthread_mutex_t *forks, t_program	*program);
 void		init_forks(pthread_mutex_t	*forks, int n);
-void		init_program(t_program	*program);
+void		init_program(t_program	*program, t_philo *philo);
 // UTILS
 int			ft_atoi(const char *nptr);
 int			ft_isnum(char *str);
@@ -63,6 +63,6 @@ int			ft_usleep(size_t milliseconds);
 
 // ROUTINE
 void		*routine(void	*philos);
-int			start_routine(t_philo *philo, t_program *program);
+int	start_routine(t_program *program);
 
 #endif

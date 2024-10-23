@@ -46,9 +46,10 @@ void	init_forks(pthread_mutex_t	*forks, int n)
 	}
 }
 
-void	init_program(t_program	*program)
+void	init_program(t_program	*program, t_philo *philo)
 {
 	program->dead = 0;
+	program->philo = philo;
 	pthread_mutex_init(&program->dead_lock, NULL);
 	pthread_mutex_init(&program->meal_lock, NULL);
 }

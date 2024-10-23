@@ -33,11 +33,6 @@ int	main(int argc, char *argv[])
 	pthread_mutex_t 	*forks;				//Inicializar os garfos fora da struct
 	int					n;
 
-
-	size_t				start;				// Trash
-	start = get_current_time();				// Trash
-
-
 	if (argc != 5 && argc != 6)
 		return (write(2, "Incorret arguments\n", 19), 1);
 	if (check_args(argv) == 1)
@@ -49,11 +44,11 @@ int	main(int argc, char *argv[])
 
 
 	init_forks(forks, n);
-	init_program(&program);
 	init_philos(philos, argv, forks, &program);
 	if (philos == NULL)
 		return (1);
-	if (start_routine(philos, &program) == 1)
+	init_program(&program, philos);
+	if (start_routine(&program) == 1)
 	{
 		pthread_mutex_destroy(&program.dead_lock);
 		pthread_mutex_destroy(forks);

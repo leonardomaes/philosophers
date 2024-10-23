@@ -12,27 +12,28 @@
 
 #include "philosophers.h"
 
-void	*is_dead(void *philos)
+void	*is_dead(void *void_program)
 {
-	t_philo *philo;
+	t_program *program;
 	int	i;
 
-	philo = (t_philo *)philos;
+	program = (t_program *)void_program;
 	while (1)
 	{
 		ft_usleep(1);
 		i = 0;
-		while (i < philo[0].n_philos)
+		while (i < program->philo[0].n_philos)
 		{
-			pthread_mutex_lock(philo[0].dead_lock);	// Alerar toda a struct philo para dentro do overall, desta forma quando um filo morrer, altera a variavel do overall para parar todos os philos na funcao check_dead na routine
-			if (get_current_time() - philo[i].last_eat >= philo[i].time_to_die && philo[i].eating == 0)
+			pthread_mutex_lock(program->philo[0].dead_lock);
+			if (get_current_time() - program->philo[i].last_eat >= program->philo[i].time_to_die && program->philo[i].eating == 0)
 			{
-				printf("%lums %i died\n", get_current_time() - philo[i].start_time, philo[i].id);
-				philo[i].dead = 1;
-				pthread_mutex_unlock(philo[0].dead_lock);
+				printf("%lums %i died\n", get_current_time() - program->philo[i].start_time, program->philo[i].id);
+				program->philo[i].dead = 1;
+				program->dead = 1;
+				pthread_mutex_unlock(program->philo[0].dead_lock);
 				return (NULL);
 			}
-			pthread_mutex_unlock(philo[0].dead_lock);
+			pthread_mutex_unlock(program->philo[0].dead_lock);
 			i++;
 		}
 	}
@@ -74,26 +75,27 @@ void	*routine(void	*philos)
 	}
 	return (NULL);
 }
+// Alerar toda a struct philo para dentro do overall, desta forma quando um filo morrer, altera a variavel do overall para parar todos os philos na funcao check_dead na routine
 
-int	start_routine(t_philo *philo, t_program *program)
+int	start_routine(t_program *program)
 {
 	pthread_t	monitor;
 	int	i;
 
 	i = 0;
-	if (pthread_create(&monitor, NULL, &is_dead, philo) != 0)
+	if (pthread_create(&monitor, NULL, &is_dead, program) != 0)
 		return (1);
-	while (i < philo[0].n_philos)
+	while (i < program->philo[0].n_philos)
 	{
-		if (pthread_create(&philo[i].philo, NULL, &routine, &philo[i]) != 0)
+		if (pthread_create(&program->philo[i].philo, NULL, &routine, &program->philo[i]) != 0)
 			return 1;
 		i++;
 	}
 	pthread_join(monitor, NULL);
 	i = 0;
-	while (i < philo[0].n_philos)
+	while (i < program->philo[0].n_philos)
 	{
-		pthread_join(philo[i].philo, NULL);
+		pthread_join(program->philo[i].philo, NULL);
 		i++;
 	}
 	program->dead = 2;
