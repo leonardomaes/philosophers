@@ -26,7 +26,7 @@ typedef struct s_philo
 {
 	pthread_t			philo;
 	int					id;
-	int					dead;
+	int					*dead;
 	int					eating;
 	size_t				start_time;
 	size_t				last_eat;
@@ -62,7 +62,11 @@ size_t		get_current_time(void);
 int			ft_usleep(size_t milliseconds);
 
 // ROUTINE
+int			phiosopher_dead(t_philo *philo, size_t	time_to_die);
+void		*is_dead(void *void_program);
+int			check_dead(t_philo *philo);
 void		*routine(void	*philos);
-int	start_routine(t_program *program);
+void		eat(t_philo *philo);
+int			start_routine(t_program *program);
 
 #endif

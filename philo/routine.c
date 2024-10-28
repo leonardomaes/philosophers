@@ -12,12 +12,10 @@
 
 #include "philosophers.h"
 
-
-
 int		phiosopher_dead(t_philo *philo, size_t	time_to_die)
 {
 	pthread_mutex_lock(philo->meal_lock);
-	if (get_current_time() - philo->last_eat > time_to_die /*&& philo->eating == 0*/)
+	if (get_current_time() - philo->last_eat >= time_to_die && philo->eating == 0)		// Possivel
 	{
 		pthread_mutex_unlock(philo->meal_lock);
 		return (1);
@@ -34,15 +32,13 @@ void	*is_dead(void *void_program)
 	program = (t_program *)void_program;
 	while (1)
 	{
-		//ft_usleep(1);
 		i = 0;
 		while (i < program->philo[0].n_philos)
-		{		// Problema na condicao quando o eating estiver 1 ou 0
-			if (phiosopher_dead(&program->philo[i], program->philo[i].time_to_die))		// && program->philo[i].eating == 0
+		{
+			if (phiosopher_dead(&program->philo[i], program->philo[i].time_to_die))
 			{
-				pthread_mutex_lock(program->philo[i].dead_lock);
 				printf("%lums %i died\n", get_current_time() - program->philo[i].start_time, program->philo[i].id);
-				program->philo[i].dead = 1;
+				pthread_mutex_lock(program->philo[i].dead_lock);
 				program->dead = 1;
 				pthread_mutex_unlock(program->philo[i].dead_lock);
 				return (NULL);
@@ -56,7 +52,7 @@ void	*is_dead(void *void_program)
 int	check_dead(t_philo *philo)
 {
 	pthread_mutex_lock(philo->dead_lock);
-	if (philo->dead == 1)
+	if (*philo->dead == 1)
 	{
 		pthread_mutex_unlock(philo->dead_lock);
 		return (1);
@@ -65,31 +61,37 @@ int	check_dead(t_philo *philo)
 	return (0);
 }
 
-void	eat(t_philo *philo)
-{
-	pthread_mutex_lock(philo->meal_lock);
-	philo->eating = 1;
-	printf("%lums %i is eating\n", get_current_time() - philo->start_time, philo->id);		//possivel erro na mutex aqui
-	philo->last_eat = get_current_time();
-	pthread_mutex_unlock(philo->meal_lock);
-	ft_usleep(philo->time_to_eat);
-	pthread_mutex_lock(philo->meal_lock);
-	philo->eating = 0;
-	pthread_mutex_unlock(philo->meal_lock);
-}
-
 void	*routine(void	*philos)
 {
 	t_philo *philo;
 
 	philo = (t_philo *)philos;
-
+	if (philo->id % 2 == 0)
+		ft_usleep(1);
 	while (check_dead(philo) == 0)
 	{
-		//ft_usleep(1);
 		eat(philo);
+		printf("%lums %i is sleeping\n", get_current_time() - philo->start_time, philo->id);
+		ft_usleep(philo->time_to_sleep);
 	}
 	return (NULL);
+}
+
+void	eat(t_philo *philo)		// Need to be fixed
+{
+	pthread_mutex_lock(philo->r_fork);
+	printf("%lums Philo %i took -> fork\n", get_current_time() - philo->start_time, philo->id);
+	pthread_mutex_lock(philo->l_fork);
+	printf("%lums Philo %i took <- fork\n", get_current_time() - philo->start_time, philo->id);
+	philo->eating = 1;
+	pthread_mutex_lock(philo->meal_lock);
+	printf("%lums %i is eating\n", get_current_time() - philo->start_time, philo->id);
+	philo->last_eat = get_current_time();
+	pthread_mutex_unlock(philo->meal_lock);
+	ft_usleep(philo->time_to_eat);
+	philo->eating = 0;
+	pthread_mutex_unlock(philo->l_fork);
+	pthread_mutex_unlock(philo->r_fork);
 }
 
 int	start_routine(t_program *program)
@@ -106,7 +108,8 @@ int	start_routine(t_program *program)
 			return (1);
 		i++;
 	}
-	pthread_join(monitor, NULL);
+	if (pthread_join(monitor, NULL) != 0)
+		return (1);
 	i = 0;
 	while (i < program->philo[0].n_philos)
 	{
@@ -114,6 +117,5 @@ int	start_routine(t_program *program)
 			return (1);
 		i++;
 	}
-	//program->dead = 2;
 	return (0);
 }

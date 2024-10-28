@@ -44,7 +44,7 @@ int	main(int argc, char *argv[])
 
 
 	init_forks(forks, n);
-	init_philos(philos, argv, forks, &program);
+	init_philos(philos, argv, forks, &program);		// Problema esta aqui, inicia o philo antes do programa
 	if (philos == NULL)
 		return (1);
 	init_program(&program, philos);
@@ -63,11 +63,3 @@ int	main(int argc, char *argv[])
 	free(philos);
 	return (0);
 }
-
-
-	/*for (int i = 0; i < ft_atoi(argv[1]); i++)		// Trash
-	{
-		printf("-->Philo %i:\ndie:   %zu\neat:   %zu\nsleep: %zu\n", i + 1, philos[i].time_to_die, philos[i].time_to_eat, philos[i].time_to_sleep);
-	}
-	printf("Time_philo 1 = %zu\n", get_current_time() - philos[0].start_time);		// Trash
-	printf("Time_program = %zu\n", get_current_time() - start);		// Trash*/

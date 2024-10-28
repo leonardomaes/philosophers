@@ -65,7 +65,7 @@ void	init_philos(t_philo *philo, char **argv, pthread_mutex_t *forks, t_program	
 		philo[i].id = i + 1;
 		philo[i].start_time = get_current_time();
 		philo[i].last_eat = get_current_time();
-		philo[i].dead = 0;
+		philo[i].dead = &program->dead;			// Mesma coisa que colocar 1 por enquanto
 		philo[i].eating = 0;
 		philo[i].n_philos = ft_atoi(argv[1]);
 		philo[i].time_to_die = ft_atoi(argv[2]);
