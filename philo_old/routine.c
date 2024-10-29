@@ -15,7 +15,7 @@
 int		phiosopher_dead(t_philo *philo, size_t	time_to_die)
 {
 	pthread_mutex_lock(philo->meal_lock);
-	if (get_current_time() - philo->last_eat >= time_to_die && philo->eating == 0)		// Possivel
+	if (get_current_time() - philo->last_eat >= time_to_die && philo->eating == 0)
 	{
 		pthread_mutex_unlock(philo->meal_lock);
 		return (1);
@@ -77,14 +77,14 @@ void	*routine(void	*philos)
 	return (NULL);
 }
 
-void	eat(t_philo *philo)		// Need to be fixed
+void	eat(t_philo *philo)
 {
 	pthread_mutex_lock(philo->r_fork);
 	printf("%lums Philo %i took -> fork\n", get_current_time() - philo->start_time, philo->id);
 	pthread_mutex_lock(philo->l_fork);
 	printf("%lums Philo %i took <- fork\n", get_current_time() - philo->start_time, philo->id);
-	philo->eating = 1;
 	pthread_mutex_lock(philo->meal_lock);
+	philo->eating = 1;
 	printf("%lums %i is eating\n", get_current_time() - philo->start_time, philo->id);
 	philo->last_eat = get_current_time();
 	pthread_mutex_unlock(philo->meal_lock);
@@ -113,8 +113,9 @@ int	start_routine(t_program *program)
 	i = 0;
 	while (i < program->philo[0].n_philos)
 	{
-		if (pthread_join(program->philo[i].philo, NULL) != 0)
-			return (1);
+		/* if (pthread_join(program->philo[i].philo, NULL) != 0)
+			return (1); */
+		pthread_detach(program->philo[i].philo);
 		i++;
 	}
 	return (0);

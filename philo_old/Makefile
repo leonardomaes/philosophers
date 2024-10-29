@@ -4,7 +4,7 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread
 
 #
-SRC =	main.c init.c utils.c
+SRC =	main.c utils.c init.c routine.c
 #
 
 # Commands

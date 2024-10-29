@@ -24,7 +24,7 @@
 
 typedef struct s_philo
 {
-	pthread_t			philo;
+	pthread_t			*philo;
 	int					id;
 	int					*dead;
 	int					eating;
@@ -38,23 +38,23 @@ typedef struct s_philo
 	pthread_mutex_t		*r_fork;
 	pthread_mutex_t		*dead_lock;
 	pthread_mutex_t		*meal_lock;
-	int					n_philos;
 }				t_philo;
 
 typedef struct s_program
 {
 	int					dead;
+	int					n_philos;
 	pthread_mutex_t		dead_lock;
 	pthread_mutex_t		meal_lock;
+	pthread_mutex_t		*forks;
 	t_philo				*philo;
 }				t_program;
 
 
 // init
 int			check_args(char **argv);
-void		init_philos(t_philo *philo, char **argv, pthread_mutex_t *forks, t_program	*program);
-void		init_forks(pthread_mutex_t	*forks, int n);
-void		init_program(t_program	*program, t_philo *philo);
+void		init_program(t_program *program, pthread_mutex_t *forks, char *argv[]);
+int			init_forks(pthread_mutex_t	*forks, int n);
 // UTILS
 int			ft_atoi(const char *nptr);
 int			ft_isnum(char *str);

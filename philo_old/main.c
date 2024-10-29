@@ -19,7 +19,7 @@ void	destroy_philos(t_program *program, pthread_mutex_t *forks)
 	pthread_mutex_destroy(&program->dead_lock);
 	pthread_mutex_destroy(&program->meal_lock);
 	i = 0;
-	while (i < program->n_philos)
+	while (i < program->philo[0].n_philos)
 	{
 		pthread_mutex_destroy(&forks[i]);
 		i++;
@@ -27,24 +27,6 @@ void	destroy_philos(t_program *program, pthread_mutex_t *forks)
 }
 
 int	main(int argc, char *argv[])
-{
-	t_program	program;
-	pthread_mutex_t	*forks;
-
-	if (argc != 5 && argc != 6)
-		return (write(2, "Incorret arguments\n", 19), 1);
-	if (check_args(argv) == 1)
-		return (1);
-	forks = malloc(sizeof(pthread_mutex_t) * ft_atoi(argv[1]));
-
-	init_forks(forks, ft_atoi(argv[1]));	
-	init_program(&program, forks, argv);
-
-	destroy_philos(&program, forks);
-	free(forks);
-}
-
-/*int	main(int argc, char *argv[])
 {
 	t_philo 			*philos;
 	t_program			program;
@@ -56,15 +38,13 @@ int	main(int argc, char *argv[])
 	if (check_args(argv) == 1)
 		return (1);
 	n = ft_atoi(argv[1]);
-
-
 	philos = malloc(sizeof(t_philo) * n);
 	forks = malloc(sizeof(pthread_mutex_t) * n);
 
 
 
 	init_forks(forks, n);
-	init_philos(philos, argv, forks, &program);
+	init_philos(philos, argv, forks, &program);		// Problema esta aqui, inicia o philo antes do programa
 	if (philos == NULL)
 		return (1);
 	init_program(&program, philos);
@@ -80,4 +60,4 @@ int	main(int argc, char *argv[])
 	free(forks);
 	free(philos);
 	return (0);
-}*/
+}
