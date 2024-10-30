@@ -61,6 +61,25 @@ int	is_dead(t_philo *philo)
 	return (0);
 }
 
+
+void	eat(t_philo *philo)
+{
+	pthread_mutex_lock(philo->r_fork);
+	printf("%lums Philo %i took -> fork\n", get_current_time() - philo->start_time, philo->id);
+	pthread_mutex_lock(philo->l_fork);
+	printf("%lums Philo %i took <- fork\n", get_current_time() - philo->start_time, philo->id);
+	pthread_mutex_lock(philo->meal_lock);
+	philo->eating = 1;
+	printf("%lums %i is eating\n", get_current_time() - philo->start_time, philo->id);
+	philo->last_eat = get_current_time();
+	pthread_mutex_unlock(philo->meal_lock);
+	ft_usleep(philo->time_to_eat);
+	philo->eating = 0;
+	pthread_mutex_unlock(philo->l_fork);
+	pthread_mutex_unlock(philo->r_fork);
+}
+
+
 void	*routine(void	*void_philo)
 {
 	t_philo *philo;
@@ -68,6 +87,7 @@ void	*routine(void	*void_philo)
 	philo = (t_philo *)void_philo;
 	while (is_dead(philo) == 0)
 	{
+		eat(philo);
 		printf("%lums %i is sleeping\n", get_current_time() - philo->start_time, philo->id);
 		ft_usleep(philo->time_to_sleep);
 		printf("%lums %i is thinking\n", get_current_time() - philo->start_time, philo->id);
