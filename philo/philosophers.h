@@ -24,7 +24,6 @@
 
 typedef struct s_philo
 {
-	pthread_t			*philo;
 	int					id;
 	int					*dead;
 	int					eating;
@@ -34,6 +33,7 @@ typedef struct s_philo
 	size_t 				time_to_eat;
 	size_t 				time_to_sleep;
 	size_t 				times_eat;
+	pthread_t			philo;
 	pthread_mutex_t		*l_fork;
 	pthread_mutex_t		*r_fork;
 	pthread_mutex_t		*dead_lock;
@@ -53,20 +53,26 @@ typedef struct s_program
 
 // init
 int			check_args(char **argv);
-void		init_program(t_program *program, pthread_mutex_t *forks, char *argv[]);
+void		init_program(t_program	*program, t_philo *philo, pthread_mutex_t *forks, char **argv);
 int			init_forks(pthread_mutex_t	*forks, int n);
+
 // UTILS
-int			ft_atoi(const char *nptr);
 int			ft_isnum(char *str);
+int			ft_atoi(const char *nptr);
 size_t		get_current_time(void);
 int			ft_usleep(size_t milliseconds);
 
 // ROUTINE
+int		phiosopher_dead(t_philo *philo, size_t	time_to_die);
+void    *check_dead(void *void_program);
+int		start_routine(t_program *program);
+
+/* ROUTINE
 int			phiosopher_dead(t_philo *philo, size_t	time_to_die);
 void		*is_dead(void *void_program);
 int			check_dead(t_philo *philo);
 void		*routine(void	*philos);
 void		eat(t_philo *philo);
-int			start_routine(t_program *program);
+int			start_routine(t_program *program);*/
 
 #endif
