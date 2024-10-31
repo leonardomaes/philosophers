@@ -61,13 +61,31 @@ int	is_dead(t_philo *philo)
 	return (0);
 }
 
+void	take_forks(t_philo *philo)
+{
+	if (philo->id % 2 == 0)
+		pthread_mutex_lock(philo->r_fork);
+	else
+		pthread_mutex_lock(philo->l_fork);
+	if (is_dead(philo) == 0)
+		printf("%lums Philo %i has taken a fork\n", get_current_time() - philo->start_time, philo->id);
+	if (philo->id % 2 == 0)
+	{
+		pthread_mutex_lock(philo->l_fork);
+		if (is_dead(philo) == 0)
+			printf("%lums Philo %i has taken a fork\n", get_current_time() - philo->start_time, philo->id);
+	}
+	else
+	{
+		pthread_mutex_lock(philo->r_fork);
+		if (is_dead(philo) == 0)
+			printf("%lums Philo %i has taken a fork\n", get_current_time() - philo->start_time, philo->id);
+	}
+}
 
 void	eat(t_philo *philo)
 {
-	pthread_mutex_lock(philo->r_fork);
-	printf("%lums Philo %i took -> fork\n", get_current_time() - philo->start_time, philo->id);
-	pthread_mutex_lock(philo->l_fork);
-	printf("%lums Philo %i took <- fork\n", get_current_time() - philo->start_time, philo->id);
+
 	pthread_mutex_lock(philo->meal_lock);
 	philo->eating = 1;
 	printf("%lums %i is eating\n", get_current_time() - philo->start_time, philo->id);
@@ -85,11 +103,27 @@ void	*routine(void	*void_philo)
 	t_philo *philo;
 
 	philo = (t_philo *)void_philo;
+
+	if (philo->id % 2 == 0)
+		ft_usleep(1);
 	while (is_dead(philo) == 0)
 	{
+		if (is_dead(philo) == 1)
+			return (NULL);
+		take_forks(philo);
+		if (is_dead(philo) == 1)
+		{
+			pthread_mutex_unlock(philo->l_fork);
+			pthread_mutex_unlock(philo->r_fork);
+			return (NULL);
+		}
 		eat(philo);
+		if (is_dead(philo) == 1)
+			return (NULL);
 		printf("%lums %i is sleeping\n", get_current_time() - philo->start_time, philo->id);
 		ft_usleep(philo->time_to_sleep);
+		if (is_dead(philo) == 1)
+			return (NULL);
 		printf("%lums %i is thinking\n", get_current_time() - philo->start_time, philo->id);
 	}
 	return (NULL);
@@ -116,6 +150,7 @@ int	start_routine(t_program *program)
 	{
 		if (pthread_join(program->philo[i].philo, NULL) != 0)
 			return (1);
+		//pthread_detach(program->philo[i].philo);
 		i++;
 	}
 	
