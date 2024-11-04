@@ -28,10 +28,10 @@ void	destroy_philos(t_program *program, pthread_mutex_t *forks)
 
 int	main(int argc, char *argv[])
 {
-	t_philo 			*philos;
-	t_program			program;
-	pthread_mutex_t 	*forks;
-	int					n;
+	t_philo			*philos;
+	t_program		program;
+	pthread_mutex_t	*forks;
+	int				n;
 
 	if (argc != 5 && argc != 6)
 		return (write(2, "Incorret arguments\n", 19), 1);
@@ -40,7 +40,6 @@ int	main(int argc, char *argv[])
 	n = ft_atoi(argv[1]);
 	philos = malloc(sizeof(t_philo) * n);
 	forks = malloc(sizeof(pthread_mutex_t) * n);
-
 	init_forks(forks, n);
 	init_program(&program, philos, forks, argv);
 	if (philos == NULL)
@@ -52,70 +51,8 @@ int	main(int argc, char *argv[])
 		free(philos);
 		return (1);
 	}
-
 	destroy_philos(&program, forks);
 	free(forks);
 	free(philos);
 	return (0);
 }
-
-/*int	main(int argc, char *argv[])
-{
-	t_program	program;
-	t_philo *philos;
-	pthread_mutex_t	*forks;
-	int	n;
-
-	n = ft_atoi(argv[1]);
-	if (argc != 5 && argc != 6)
-		return (write(2, "Incorret arguments\n", 19), 1);
-	if (check_args(argv) == 1)
-		return (1);
-	philos = malloc(sizeof(t_philo) * n);
-	forks = malloc(sizeof(pthread_mutex_t) * n);
-
-	init_forks(forks, n);	
-	init_program(&program, philos, forks, argv, n);
-
-	destroy_philos(&program, forks);
-	free(philos);
-	free(forks);
-}*/
-
-/*int	main(int argc, char *argv[])
-{
-	t_philo 			*philos;
-	t_program			program;
-	pthread_mutex_t 	*forks;				//Inicializar os garfos fora da struct
-	int					n;
-
-	if (argc != 5 && argc != 6)
-		return (write(2, "Incorret arguments\n", 19), 1);
-	if (check_args(argv) == 1)
-		return (1);
-	n = ft_atoi(argv[1]);
-
-
-	philos = malloc(sizeof(t_philo) * n);
-	forks = malloc(sizeof(pthread_mutex_t) * n);
-
-
-
-	init_forks(forks, n);
-	init_philos(philos, argv, forks, &program);
-	if (philos == NULL)
-		return (1);
-	init_program(&program, philos);
-	if (start_routine(&program) == 1)
-	{
-		destroy_philos(&program, forks);
-		free(forks);
-		free(philos);
-		return (1);
-	}
-
-	destroy_philos(&program, forks);
-	free(forks);
-	free(philos);
-	return (0);
-}*/

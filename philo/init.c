@@ -34,9 +34,9 @@ int	check_args(char **argv)
 	return (0);
 }
 
-int	init_forks(pthread_mutex_t	*forks, int n)
+int	init_forks(pthread_mutex_t *forks, int n)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < n)
@@ -48,12 +48,28 @@ int	init_forks(pthread_mutex_t	*forks, int n)
 	return (0);
 }
 
-
-void	init_program(t_program	*program, t_philo *philo, pthread_mutex_t *forks, char **argv)
+void	init_args(t_philo *philo, char **argv)
 {
-	int		i;
+	philo->eating = 0;
+	philo->times_eat = 0;
+	philo->start_time = get_current_time();
+	philo->last_eat = get_current_time();
+	philo->time_to_die = ft_atoi(argv[2]);
+	philo->time_to_eat = ft_atoi(argv[3]);
+	philo->time_to_sleep = ft_atoi(argv[4]);
+	if (argv[5])
+		philo->max_eat = ft_atoi(argv[5]);
+	else
+		philo->max_eat = -1;
+}
+
+void	init_program(t_program *program, t_philo *philo, pthread_mutex_t *forks,
+		char **argv)
+{
+	int	i;
 
 	program->dead = 0;
+	program->finished = 0;
 	program->n_philos = ft_atoi(argv[1]);
 	pthread_mutex_init(&program->dead_lock, NULL);
 	pthread_mutex_init(&program->meal_lock, NULL);
@@ -61,12 +77,9 @@ void	init_program(t_program	*program, t_philo *philo, pthread_mutex_t *forks, ch
 	while (i < ft_atoi(argv[1]))
 	{
 		philo[i].id = i + 1;
-		philo[i].eating = 0;
-		philo[i].start_time = get_current_time();
-		philo[i].last_eat = get_current_time();
-		philo[i].time_to_die = ft_atoi(argv[2]);
-		philo[i].time_to_eat = ft_atoi(argv[3]);
-		philo[i].time_to_sleep = ft_atoi(argv[4]);
+		init_args(&philo[i], argv);
+		philo[i].n_philos = program->n_philos;
+		philo[i].finished = &program->finished;
 		philo[i].dead = &program->dead;
 		philo[i].dead_lock = &program->dead_lock;
 		philo[i].meal_lock = &program->meal_lock;
