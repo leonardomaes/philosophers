@@ -54,17 +54,17 @@ typedef struct s_program
 	t_philo			*philo;
 }					t_program;
 
-// Actions
-void				take_forks(t_philo *philo);
-void				eat(t_philo *philo);
-
-// init
+// INIT
 int					check_args(char **argv);
 void				init_program(t_program *program, t_philo *philo,
 						pthread_mutex_t *forks, char **argv);
+void				init_args(t_philo *philo, t_program *program, char **argv);
 int					init_forks(pthread_mutex_t *forks, int n);
 
 // ROUTINE
+void				take_forks(t_philo *philo);
+void				eat(t_philo *philo);
+int					sleepwalker(t_philo *philo);
 void				*routine(void *void_philo);
 int					start_routine(t_program *program);
 
@@ -73,9 +73,12 @@ int					ft_isnum(char *str);
 int					ft_atoi(const char *nptr);
 size_t				get_current_time(void);
 int					ft_usleep(size_t milliseconds);
+
+// MONITOR
 int					is_dead(t_philo *philo);
 int					phiosopher_dead(t_philo *philo, size_t time_to_die);
 int					philosopher_full(t_philo *philo);
+int					checker(t_program *program, int *count);
 void				*check_dead(void *void_program);
 
 /* ROUTINE

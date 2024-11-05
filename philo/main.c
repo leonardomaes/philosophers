@@ -12,7 +12,8 @@
 
 #include "philosophers.h"
 
-void	destroy_philos(t_program *program, pthread_mutex_t *forks)
+void	destroy_philos(t_program *program, pthread_mutex_t *forks,
+		t_philo *philos)
 {
 	int	i;
 
@@ -24,6 +25,8 @@ void	destroy_philos(t_program *program, pthread_mutex_t *forks)
 		pthread_mutex_destroy(&forks[i]);
 		i++;
 	}
+	free(forks);
+	free(philos);
 }
 
 int	main(int argc, char *argv[])
@@ -46,13 +49,9 @@ int	main(int argc, char *argv[])
 		return (1);
 	if (start_routine(&program) == 1)
 	{
-		destroy_philos(&program, forks);
-		free(forks);
-		free(philos);
+		destroy_philos(&program, forks, philos);
 		return (1);
 	}
-	destroy_philos(&program, forks);
-	free(forks);
-	free(philos);
+	destroy_philos(&program, forks, philos);
 	return (0);
 }

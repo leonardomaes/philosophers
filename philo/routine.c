@@ -14,17 +14,27 @@
 
 void	take_forks(t_philo *philo)
 {
-	pthread_mutex_lock(philo->r_fork);
+	pthread_mutex_t	*tmp_r;
+	pthread_mutex_t	*tmp_l;
+
+	tmp_r = philo->r_fork;
+	tmp_l = philo->l_fork;
+	if (philo->id % 2 == 1)
+	{
+		tmp_r = philo->l_fork;
+		tmp_l = philo->r_fork;
+	}
+	pthread_mutex_lock(tmp_r);
 	if (is_dead(philo) == 0)
 		printf("%lu %i has taken a fork\n", get_current_time()
 			- philo->start_time, philo->id);
 	if (philo->n_philos == 1)
 	{
 		ft_usleep(philo->time_to_die);
-		pthread_mutex_unlock(philo->r_fork);
+		pthread_mutex_unlock(tmp_r);
 		return ;
 	}
-	pthread_mutex_lock(philo->l_fork);
+	pthread_mutex_lock(tmp_l);
 	if (is_dead(philo) == 0)
 		printf("%lu %i has taken a fork\n", get_current_time()
 			- philo->start_time, philo->id);
@@ -32,6 +42,9 @@ void	take_forks(t_philo *philo)
 
 void	eat(t_philo *philo)
 {
+	pthread_mutex_t	*tmp_r;
+	pthread_mutex_t	*tmp_l;
+
 	printf("%lu %i is eating\n", get_current_time() - philo->start_time,
 		philo->id);
 	pthread_mutex_lock(philo->meal_lock);
@@ -41,8 +54,29 @@ void	eat(t_philo *philo)
 	philo->eating = 1;
 	ft_usleep(philo->time_to_eat);
 	philo->eating = 0;
-	pthread_mutex_unlock(philo->l_fork);
-	pthread_mutex_unlock(philo->r_fork);
+	tmp_r = philo->r_fork;
+	tmp_l = philo->l_fork;
+	if (philo->id % 2 == 1)
+	{
+		tmp_r = philo->l_fork;
+		tmp_l = philo->r_fork;
+	}
+	pthread_mutex_unlock(tmp_l);
+	pthread_mutex_unlock(tmp_r);
+}
+
+int	sleepwalker(t_philo *philo)
+{
+	if (is_dead(philo) == 1)
+		return (1);
+	printf("%lu %i is sleeping\n", get_current_time() - philo->start_time,
+		philo->id);
+	ft_usleep(philo->time_to_sleep);
+	if (is_dead(philo) == 1)
+		return (1);
+	printf("%lu %i is thinking\n", get_current_time() - philo->start_time,
+		philo->id);
+	return (0);
 }
 
 void	*routine(void *void_philo)
@@ -66,15 +100,8 @@ void	*routine(void *void_philo)
 		eat(philo);
 		if (*philo->finished == 1)
 			break ;
-		if (is_dead(philo) == 1)
+		if (sleepwalker(philo) == 1)
 			return (NULL);
-		printf("%lu %i is sleeping\n", get_current_time() - philo->start_time,
-			philo->id);
-		ft_usleep(philo->time_to_sleep);
-		if (is_dead(philo) == 1)
-			return (NULL);
-		printf("%lu %i is thinking\n", get_current_time() - philo->start_time,
-			philo->id);
 		if (philo->times_eat == philo->max_eat)
 			break ;
 	}
@@ -91,7 +118,7 @@ int	start_routine(t_program *program)
 	while (i < program->n_philos)
 	{
 		pthread_create(&program->philo[i].philo, NULL, &routine,
-				&program->philo[i]);
+			&program->philo[i]);
 		i++;
 	}
 	pthread_join(monitor, NULL);

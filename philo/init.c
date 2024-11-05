@@ -48,7 +48,7 @@ int	init_forks(pthread_mutex_t *forks, int n)
 	return (0);
 }
 
-void	init_args(t_philo *philo, char **argv)
+void	init_args(t_philo *philo, t_program *program, char **argv)
 {
 	philo->eating = 0;
 	philo->times_eat = 0;
@@ -61,6 +61,11 @@ void	init_args(t_philo *philo, char **argv)
 		philo->max_eat = ft_atoi(argv[5]);
 	else
 		philo->max_eat = -1;
+	philo->n_philos = program->n_philos;
+	philo->finished = &program->finished;
+	philo->dead = &program->dead;
+	philo->dead_lock = &program->dead_lock;
+	philo->meal_lock = &program->meal_lock;
 }
 
 void	init_program(t_program *program, t_philo *philo, pthread_mutex_t *forks,
@@ -77,12 +82,7 @@ void	init_program(t_program *program, t_philo *philo, pthread_mutex_t *forks,
 	while (i < ft_atoi(argv[1]))
 	{
 		philo[i].id = i + 1;
-		init_args(&philo[i], argv);
-		philo[i].n_philos = program->n_philos;
-		philo[i].finished = &program->finished;
-		philo[i].dead = &program->dead;
-		philo[i].dead_lock = &program->dead_lock;
-		philo[i].meal_lock = &program->meal_lock;
+		init_args(&philo[i], program, argv);
 		philo[i].l_fork = &forks[i];
 		if (i == 0)
 			philo[i].r_fork = &forks[ft_atoi(argv[1]) - 1];
